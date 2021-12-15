@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  database:
+    image: mariadb
+    container_name: pedidopago_produtos
+    restart: always
+    ports:
+      - ${MARIADB_PORT}:3306
+    environment:
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+
+  api:
+    build: .
+    command: yarn start
+    env_file:
+      - .env
+    depends_on:
+      - database
+    ports:
+      - "50052:50052"
+    volumes:
+      - .:/usr/app

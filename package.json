@@ -1,0 +1,28 @@
+{
+  "name": "pedidopago-microservices-products",
+  "version": "1.0.0",
+  "description": "Microservico para produtos",
+  "main": "index.js",
+  "author": "luCAOrx",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "node dist/src/index.js",
+    "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/index.ts",
+    "build:proto": "sh src/scripts/proto-bulid.sh"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.4.4",
+    "@grpc/proto-loader": "^0.6.7",
+    "@prisma/client": "3.6.0",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/google-protobuf": "^3.15.5",
+    "grpc-tools": "^1.11.2",
+    "grpc_tools_node_protoc_ts": "^5.3.2",
+    "prisma": "3.6.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.5.4"
+  }
+}

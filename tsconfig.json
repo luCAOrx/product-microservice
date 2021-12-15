@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",                        
+    "lib": ["esnext"],    
+    "allowJs": true,
+    "outDir": "./dist", 
+    "rootDirs": [
+      "./__tests__",
+      "./src"
+    ],
+    "removeComments": true,        
+    "typeRoots": [
+      "./node_modules/@types"
+    ],   
+    "esModuleInterop": true,                     
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,           
+    "emitDecoratorMetadata": true,            
+    "skipLibCheck": true,                        
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "strict": true
+  }
+}
