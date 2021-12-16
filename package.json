@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start": "node dist/src/index.js",
+    "start": "ts-node-dev --transpile-only --ignore-watch node_modules src/index.ts",
     "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/index.ts",
     "build:proto": "sh src/scripts/proto-bulid.sh"
   },
