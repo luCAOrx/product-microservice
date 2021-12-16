@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import { loadPackageDefinition, Server, ServerCredentials } from '@grpc/grpc-js';
 
 import { loadSync } from '@grpc/proto-loader';
@@ -38,7 +40,7 @@ server.addService(product.ProductService.service, {
   deleteProduct
 });
 
-server.bindAsync(`0.0.0.0:${process.env.SERVER_PORT}`, ServerCredentials.createInsecure(), () => {
+server.bindAsync(`${process.env.SERVER_URL}`, ServerCredentials.createInsecure(), () => {
   server.start();
 });
 
