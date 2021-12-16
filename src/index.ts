@@ -38,7 +38,7 @@ server.addService(product.ProductService.service, {
   deleteProduct
 });
 
-server.bindAsync('0.0.0.0:50052', ServerCredentials.createInsecure(), () => {
+server.bindAsync(`0.0.0.0:${process.env.SERVER_PORT}`, ServerCredentials.createInsecure(), () => {
   server.start();
 });
 
