@@ -1,10 +1,23 @@
 import { PrismaClient } from '@prisma/client'
 
+import aws from 'aws-sdk';
+
+import multerS3 from 'multer-s3';
+
 import { promisify } from 'util';
 import fileSystem from 'fs';
 import path from 'path';
 
+multerS3({
+  s3: new aws.S3(),
+  bucket: String(process.env.AWS_BUCKET_NAME),
+  contentType: multerS3.AUTO_CONTENT_TYPE,
+  acl: 'public-read',
+});
+
 const prisma = new PrismaClient();
+
+const s3 = new aws.S3();
 
 export async function createProduct(call: any, callback: any) {
   const {
@@ -118,6 +131,11 @@ export async function updateProductData(call: any, callback: any) {
     promisify(fileSystem.unlink)(path.resolve(
       __dirname, '..', '..', '..', '..', 'api', 'uploads', `product/${thumbnailInDataBase?.thumbnail}`,
     ));
+
+    s3.deleteObject({
+      Bucket: String(process.env.AWS_BUCKET_NAME),
+      Key: String(thumbnailInDataBase?.thumbnail),
+    }).promise();
 
     const product = await prisma.products.update({
       where: { id },
