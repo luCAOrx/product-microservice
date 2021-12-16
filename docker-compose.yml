@@ -9,8 +9,9 @@ services:
       - ${MARIADB_PORT}:3306
     environment:
       MARIADB_ROOT_USER: ${MARIADB_USER}
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD}
       MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_ROOT_HOST: ${MARIADB_HOST}
 
   product_microservice:
     image: node:latest
@@ -20,8 +21,6 @@ services:
      - .env
     depends_on:
       - product_database
-    env_file:
-      - .env
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     working_dir: /usr/app
