@@ -12,9 +12,11 @@ services:
       MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD}
       MARIADB_DATABASE: ${MARIADB_DATABASE}
       MARIADB_ROOT_HOST: ${MARIADB_HOST}
+    networks:
+      - product_microservice
 
   product_microservice:
-    image: node:latest
+    image: node:alpine
     container_name: product_microservice
     restart: always
     env_file:
@@ -27,8 +29,12 @@ services:
     volumes:
       - .:/usr/app
     command: yarn start
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
+    networks:
+      - product_microservice
+      - api
+
+networks:
+  product_microservice:
+    driver: bridge         
+  api:
+    driver: bridge
