@@ -8,16 +8,18 @@ import { promisify } from 'util';
 import fileSystem from 'fs';
 import path from 'path';
 
+import { productAmazonS3Config } from '../config/productAmazonS3';
+
 multerS3({
-  s3: new aws.S3(),
-  bucket: String(process.env.AWS_BUCKET_NAME),
+  s3: new aws.S3(productAmazonS3Config),
+  bucket: String(process.env.AWS_PRODUCTS_BUCKET_NAME),
   contentType: multerS3.AUTO_CONTENT_TYPE,
   acl: 'public-read',
 });
 
 const prisma = new PrismaClient();
 
-const s3 = new aws.S3();
+const s3 = new aws.S3(productAmazonS3Config);
 
 export async function createProduct(call: any, callback: any) {
   const {
@@ -45,6 +47,17 @@ export async function createProduct(call: any, callback: any) {
 
     return callback(null, { product });
   } catch (error) {
+    if (process.env.STORAGE_TYPE === 'local') {
+      promisify(fileSystem.unlink)(path.resolve(
+        __dirname, '..', '..', '..', '..', 'api', 'uploads', `product/${thumbnail}`,
+      ));
+    } else {
+      s3.deleteObject({
+        Bucket: String(process.env.AWS_PRODUCTS_BUCKET_NAME),
+        Key: thumbnail,
+      }).promise();
+    }
+
     return callback(error, null);
   };
 };
@@ -128,14 +141,16 @@ export async function updateProductData(call: any, callback: any) {
       select: { thumbnail: true }
     })
 
-    promisify(fileSystem.unlink)(path.resolve(
-      __dirname, '..', '..', '..', '..', 'api', 'uploads', `product/${thumbnailInDataBase?.thumbnail}`,
-    ));
-
-    s3.deleteObject({
-      Bucket: String(process.env.AWS_BUCKET_NAME),
-      Key: String(thumbnailInDataBase?.thumbnail),
-    }).promise();
+    if (process.env.STORAGE_TYPE === 'local') {
+      promisify(fileSystem.unlink)(path.resolve(
+        __dirname, '..', '..', '..', '..', 'api', 'uploads', `product/${thumbnailInDataBase?.thumbnail}`,
+      ));
+    } else {
+      s3.deleteObject({
+        Bucket: String(process.env.AWS_PRODUCTS_BUCKET_NAME),
+        Key: String(thumbnailInDataBase?.thumbnail),
+      }).promise();
+    }
 
     const product = await prisma.products.update({
       where: { id },
@@ -152,6 +167,22 @@ export async function updateProductData(call: any, callback: any) {
 
     return callback(null, { product });
   } catch (error) {
+    const thumbnailInDataBase = await prisma.products.findFirst({
+      where: { id },
+      select: { thumbnail: true }
+    })
+
+    if (process.env.STORAGE_TYPE === 'local') {
+      promisify(fileSystem.unlink)(path.resolve(
+        __dirname, '..', '..', '..', '..', 'api', 'uploads', `product/${thumbnailInDataBase?.thumbnail}`,
+      ));
+    } else {
+      s3.deleteObject({
+        Bucket: String(process.env.AWS_PRODUCTS_BUCKET_NAME),
+        Key: String(thumbnailInDataBase?.thumbnail),
+      }).promise();
+    }
+
     return callback(error, null);
   };
 };
@@ -163,11 +194,18 @@ export async function deleteProduct(call: any, callback: any) {
     const thumbnailInDataBase = await prisma.products.findFirst({
       where: { id },
       select: { thumbnail: true }
-    });
-    
-    promisify(fileSystem.unlink)(path.resolve(
-      __dirname, '..', '..', '..', '..', 'api', 'uploads', `product/${thumbnailInDataBase?.thumbnail}`,
-    ));
+    })
+
+    if (process.env.STORAGE_TYPE === 'local') {
+      promisify(fileSystem.unlink)(path.resolve(
+        __dirname, '..', '..', '..', '..', 'api', 'uploads', `product/${thumbnailInDataBase?.thumbnail}`,
+      ));
+    } else {
+      s3.deleteObject({
+        Bucket: String(process.env.AWS_PRODUCTS_BUCKET_NAME),
+        Key: String(thumbnailInDataBase?.thumbnail),
+      }).promise();
+    }
 
     await prisma.products.delete({
       where: { id }
