@@ -13,10 +13,10 @@ services:
       MARIADB_DATABASE: ${MARIADB_DATABASE}
       MARIADB_ROOT_HOST: ${MARIADB_HOST}
     networks:
-      - product_microservice
+      - pedidopago
 
   product_microservice:
-    image: node:alpine
+    image: node:latest
     container_name: product_microservice
     restart: always
     env_file:
@@ -30,11 +30,9 @@ services:
       - .:/usr/app
     command: yarn start
     networks:
-      - product_microservice
-      - api
+      - pedidopago
 
 networks:
-  product_microservice:
-    driver: bridge         
-  api:
+  pedidopago:
+    name: pedidopago_products_microservice
     driver: bridge
